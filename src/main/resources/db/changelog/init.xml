@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="init-position-type" author="StanislavShir">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="position_type"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE position_type (
+            id BIGINT PRIMARY KEY,
+            name VARCHAR(150) NOT NULL
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="init-electrotype" author="StanislavShir">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="electrotype"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE electrotype (
+            id BIGINT PRIMARY KEY,
+            name VARCHAR(150) NOT NULL
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="init-shop" author="StanislavShir">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="shop"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE shop (
+            id BIGINT PRIMARY KEY,
+            name VARCHAR(150) NOT NULL,
+            address TEXT NOT NULL
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="init-purchase-type" author="StanislavShir">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="purchase_type"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE purchase_type (
+            id BIGINT PRIMARY KEY,
+            name VARCHAR(150) NOT NULL
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="init-employee" author="StanislavShir">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="employee"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE employee (
+            id BIGINT PRIMARY KEY,
+            last_name VARCHAR(100) NOT NULL,
+            first_name VARCHAR(100) NOT NULL,
+            patronymic VARCHAR(100),
+            birth_date DATE NOT NULL,
+            position_id BIGINT REFERENCES position_type(id),
+            shop_id BIGINT REFERENCES shop(id),
+            gender BOOLEAN NOT NULL
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="init-electro_item" author="StanislavShir">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="electro_item"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE electro_item (
+            id BIGINT PRIMARY KEY,
+            name VARCHAR(150) NOT NULL,
+            e_type_id BIGINT REFERENCES electrotype(id),
+            price NUMERIC(10, 2) NOT NULL,
+            count INTEGER NOT NULL,
+            archived BOOLEAN NOT NULL,
+            description TEXT
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="init-purchase" author="StanislavShir">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="purchase"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE purchase (
+            id BIGINT PRIMARY KEY,
+            electro_id BIGINT REFERENCES electro_item(id),
+            employee_id BIGINT REFERENCES employee(id),
+            shop_id BIGINT REFERENCES shop(id),
+            purchase_date TIMESTAMP NOT NULL,
+            type_id BIGINT REFERENCES purchase_type(id)
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="init-electro-employee" author="StanislavShir">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="electro_employee"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE electro_employee (
+            electrotype_id BIGINT REFERENCES electrotype(id),
+            employee_id BIGINT REFERENCES employee(id),
+            PRIMARY KEY (electrotype_id, employee_id)
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="init-electro-shop" author="StanislavShir">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="electro_shop"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TABLE electro_shop (
+            electro_item_id BIGINT REFERENCES electro_item(id),
+            shop_id BIGINT REFERENCES shop(id),
+            count INTEGER,
+            PRIMARY KEY (electro_item_id, shop_id)
+            );
+        </sql>
+    </changeSet>
+</databaseChangeLog>

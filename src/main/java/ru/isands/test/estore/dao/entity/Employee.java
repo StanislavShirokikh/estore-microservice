@@ -1,71 +1,45 @@
 package ru.isands.test.estore.dao.entity;
 
-
-import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import lombok.Data;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 @Entity
-@Table(name = "store_employee")
-public class Employee implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-	
-	/**
-	 * Идентификатор сотрудника
-	 */
+@Data
+public class Employee {
 	@Id
-	@GeneratedValue(strategy = GenerationType.TABLE, generator = "employee_counter")
-	@TableGenerator(name = "employee_counter", pkColumnName = "name", pkColumnValue = "ru.isands.test.estore.dao.entity.Employee", table = "counter", valueColumnName = "currentid", allocationSize = 2)
-	@Column(name = "id_", unique = true, nullable = false)
-	Long id;
-	
-	/**
-	 * Фамилия сотрудника
-	 */
-	@Column(name = "lastname", nullable = false, length = 100)
-	String lastName;
-	
-	/**
-	 * Имя сотрудника
-	 */
-	@Column(name = "firstname", nullable = false, length = 100)
-	String firstName;
-	
-	/**
-	 * Отчество сотрудника
-	 */
-	@Column(name = "patronymic", nullable = false, length = 100)
-	String patronymic;
-	
-	/**
-	 * Дата рождения сотрудника
-	 */
-	@Column(name = "birthDate", nullable = false)
-	Date birthDate;
-	
-	/**
-	 * Ссылка на должность сотрудника
-	 */
-	@Column(name = "positionId", nullable = false)
-	Long positionId;
-	
-	/**
-	 * Пол сотрудника (true - мужской, false - женский)
-	 */
-	@Column(name = "gender", nullable = false)
-	boolean gender;
-
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	@Column(nullable = false, length = 100)
+	private String lastName;
+	@Column(nullable = false, length = 100)
+	private String firstName;
+	@Column(length = 100)
+	private String patronymic;
+	@Column(nullable = false)
+	private LocalDate birthDate;
+	@ManyToOne
+	@JoinColumn(name = "position_id")
+	private PositionType position;
+	@ManyToOne
+	@JoinColumn(name = "shop_id")
+	private Shop shop;
+	@ManyToMany
+	@JoinTable(name = "electro_employee",
+			joinColumns = @JoinColumn(name = "employee_id"),
+			inverseJoinColumns = @JoinColumn(name = "electrotype_id"))
+	private List<ElectroType>  electroTypes;
+	@Column(nullable = false)
+	private Boolean gender;
 }
